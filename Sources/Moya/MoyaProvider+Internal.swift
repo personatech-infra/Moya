@@ -58,15 +58,21 @@ public extension MoyaProvider {
             case .success(let urlRequest):
                 request = urlRequest
             case .failure(let error):
-                pluginsWithCompletion(.failure(error))
+                if self.trackInflights {
+                  self.lock.lock()
+                  self.inflightRequests[endpoint]?.forEach { $0(.failure(error)) }
+                  self.inflightRequests.removeValue(forKey: endpoint)
+                  self.lock.unlock()
+                } else {
+                  pluginsWithCompletion(.failure(error))
+                }
                 return
             }
 
             let networkCompletion: Moya.Completion = { result in
               if self.trackInflights {
-                self.inflightRequests[endpoint]?.forEach { $0(result) }
-
                 self.lock.lock()
+                self.inflightRequests[endpoint]?.forEach { $0(result) }
                 self.inflightRequests.removeValue(forKey: endpoint)
                 self.lock.unlock()
               } else {
