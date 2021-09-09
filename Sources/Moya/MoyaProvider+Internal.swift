@@ -57,7 +57,7 @@ public extension MoyaProvider {
                 if self.trackInflights {
                   self.lock.lock()
                   self.inflightRequests[endpoint]?.forEach { $0(.failure(error)) }
-                  self.inflightRequests.removeValue(forKey: endpoint)
+                  self.internalInflightRequests.removeValue(forKey: endpoint)
                   self.lock.unlock()
                 } else {
                   pluginsWithCompletion(.failure(error))
@@ -69,7 +69,7 @@ public extension MoyaProvider {
               if self.trackInflights {
                 self.lock.lock()
                 self.inflightRequests[endpoint]?.forEach { $0(result) }
-                self.inflightRequests.removeValue(forKey: endpoint)
+                self.internalInflightRequests.removeValue(forKey: endpoint)
                 self.lock.unlock()
               } else {
                 pluginsWithCompletion(result)
