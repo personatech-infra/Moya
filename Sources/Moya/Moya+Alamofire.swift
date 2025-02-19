@@ -96,16 +96,16 @@ extension DownloadRequest: Requestable {
     internal func response(callbackQueue: DispatchQueue?, completionHandler: @escaping RequestableCompletion) -> Self {
         if let callbackQueue = callbackQueue {
             return response(queue: callbackQueue) { handler  in
-                completionHandler(handler.response, handler.request, fileDownloadedData(isError: handler.error != nil, fileUrl: handler.fileURL), handler.error)
+                completionHandler(handler.response, handler.request, DownloadRequest.fileDownloadedData(isError: handler.error != nil, fileUrl: handler.fileURL), handler.error)
             }
         } else {
             return response { handler  in
-                completionHandler(handler.response, handler.request, fileDownloadedData(isError: handler.error != nil, fileUrl: handler.fileURL), handler.error)
+                completionHandler(handler.response, handler.request, DownloadRequest.fileDownloadedData(isError: handler.error != nil, fileUrl: handler.fileURL), handler.error)
             }
         }
     }
 
-    internal func fileDownloadedData(isError: Bool, fileUrl: URL?) -> Data? {
+    internal static func fileDownloadedData(isError: Bool, fileUrl: URL?) -> Data? {
         if let fileUrl = fileUrl {
             return isError ? try? Data(contentsOf: fileUrl) : nil
         }
